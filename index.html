@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>六合彩玄學感應大師</title>
+    <style>
+        :root { --gold: #ffd700; --red: #ff4d4d; --bg: #0d0d0d; }
+        body { background: var(--bg); color: white; font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif; display: flex; justify-content: center; margin: 0; }
+        .app { max-width: 480px; width: 100%; padding: 20px; box-sizing: border-box; position: relative; }
+        
+        /* 警示語 */
+        .warning-bar { background: #ffcc00; color: #000; text-align: center; font-weight: bold; font-size: 13px; padding: 6px; border-radius: 5px; margin-bottom: 15px; }
+        
+        /* 輸入區塊 */
+        .input-box { background: #1a1a1a; padding: 15px; border-radius: 15px; border: 1px solid #333; margin-bottom: 15px; }
+        label { display: block; font-size: 11px; color: #888; margin-bottom: 4px; }
+        input, select { width: 100%; background: #222; border: 1px solid #444; color: var(--gold); padding: 10px; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; font-size: 16px; }
+
+        /* 掃描儀器 */
+        .scanner-container { position: relative; width: 150px; height: 150px; margin: 20px auto; border: 3px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; background: rgba(255, 215, 0, 0.05); -webkit-user-select: none; }
+        .scanner-line { position: absolute; width: 100%; height: 3px; background: var(--gold); top: 0; left: 0; box-shadow: 0 0 15px var(--gold); display: none; }
+        .scanning .scanner-line { display: block; animation: scan 1.5s infinite linear; }
+        
+        /* 結果區域 */
+        .result { display: none; animation: fadeIn 1s; }
+        .balls { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 15px 0; }
+        .ball { width: 42px; height: 42px; background: radial-gradient(circle at 30% 30%, #ff4d4d, #990000); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); border: 1px solid #ff7b7b; }
+        
+        /* 按鈕樣式 */
+        .share-btn { background: #25d366; color: white; border: none; padding: 12px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
+        .reset-btn { background: transparent; border: 1px solid #444; color: #888; padding: 8px; width: 100%; border-radius: 10px; margin-top: 10px; cursor: pointer; }
+
+        /* 慈善與求助 */
+        .charity-info { margin-top: 25px; padding: 15px; background: #111; border-radius: 12px; border: 1px solid #333; font-size: 12px; line-height: 1.6; color: #999; }
+        .help-link { color: #4db8ff; text-decoration: none; display: block; margin: 4px 0; }
+
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div class="warning-bar">🈲 賭博化家產 · 博弈須理性</div>
+    
+    <h1 style="text-align: center; color: var(--gold); letter-spacing: 2px;">🔮 玄學取號寶鑑</h1>
+
+    <div id="setupArea">
+        <div class="input-box">
+            <label>生肖年份</label>
+            <select id="ySel"></select>
+            <label>出生日期</label>
+            <input type="date" id="dateInput" value="1995-01-01">
+        </div>
+
+        <div class="scanner-container" id="scanner" onmousedown="startScan()" onmouseup="stopScan()" ontouchstart="startScan()" ontouchend="stopScan()">
+            <div class="scanner-line"></div>
+            <div style="font-size:60px; filter: drop-shadow(0 0 10px var(--gold));">✋</div>
+        </div>
+        <p id="status" style="text-align:center; color:var(--gold); font-size:14px; margin-top: -10px;">【 長按手掌感應磁場 】</p>
+    </div>
+
+    <div class="result" id="res">
+        <div class="balls" id="ballBox"></div>
+        <div id="details" style="background:rgba(255,215,0,0.1); padding:15px; border-radius:10px; font-size:14px; border-left: 3px solid var(--gold);"></div>
+        
+        <button class="share-btn" onclick="shareToWhatsApp()">
+            <span>🟢 分享幸運給 WhatsApp 好友</span>
+        </button>
+        <button class="reset-btn" onclick="location.reload()">重新測算</button>
+    </div>
+
+    <div class="charity-info">
+        <strong style="color:#eee;">🌱 社會責任與關懷</strong>
+        <p>博彩乃娛樂，切勿影響日常生活。如需協助：</p>
+        <a class="help-link" href="tel:1834633">📞 戒賭熱線：1834 633</a>
+        <a class="help-link" target="_blank" href="https://www.tungwah.org.hk/direct-services/rehabilitation/detoxification-and-gambling-counselling/">🏢 東華三院平和坊</a>
+        <p style="margin-top:10px; font-size:11px;">💡 提示：中獎後可考慮捐贈部分彩金予 <b>香港紅十字會</b> 或 <b>奧比斯</b>，累積福報。</p>
+    </div>
+</div>
+
+<script>
+// 初始化年份
+const zodiacs = ["鼠", "牛", "虎", "兔", "龍", "蛇", "馬", "羊", "猴", "雞", "狗", "豬"];
+const ySel = document.getElementById('ySel');
+for(let i=2026; i>=1950; i--) {
+    let opt = document.createElement('option'); opt.value = i; opt.text = `${i}年 (屬${zodiacs[(i-4)%12]})`;
+    ySel.add(opt);
+}
+
+// 音效系統
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playSound(freq, duration) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    osc.start(); osc.stop(audioCtx.currentTime + duration);
+}
+
+let scanTimer;
+let luckyNumbers = [];
+
+function startScan() {
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    document.getElementById('scanner').classList.add('scanning');
+    document.getElementById('status').innerText = "正在讀取掌紋磁場...";
+    
+    const beep = setInterval(() => {
+        if(!document.getElementById('scanner').classList.contains('scanning')) clearInterval(beep);
+        else playSound(150, 0.05);
+    }, 200);
+
+    scanTimer = setTimeout(() => {
+        clearInterval(beep);
+        playSound(660, 0.4);
+        generateResult();
+    }, 2500);
+}
+
+function stopScan() {
+    document.getElementById('scanner').classList.remove('scanning');
+    if(document.getElementById('res').style.display !== "block") {
+        clearTimeout(scanTimer);
+        document.getElementById('status').innerText = "感應中斷，請長按";
+    }
+}
+
+function generateResult() {
+    document.getElementById('setupArea').style.display = "none";
+    document.getElementById('res').style.display = "block";
+    
+    // 邏輯運算
+    luckyNumbers = [];
+    while(luckyNumbers.length < 6) {
+        let n = Math.floor(Math.random() * 49) + 1;
+        if(!luckyNumbers.includes(n)) luckyNumbers.push(n);
+    }
+    luckyNumbers.sort((a,b)=>a-b);
+
+    const box = document.getElementById('ballBox');
+    box.innerHTML = '';
+    luckyNumbers.forEach(n => {
+        let b = document.createElement('div'); b.className = 'ball'; b.innerText = n; box.appendChild(b);
+    });
+
+    document.getElementById('details').innerHTML = `
+        <b>今日卦象：</b> 財星入庫，大利南方。<br>
+        <b>玄學建議：</b> 此組號碼帶有「火生土」之勢，建議在稍後 17:00-19:00 (酉時) 於人氣旺盛處購買。
+    `;
+}
+
+function shareToWhatsApp() {
+    const text = `🔮 我剛使用了玄學感應取號，這是我今日的六合彩幸運號碼：${luckyNumbers.join(', ')}！\n\n大師提醒：小賭怡情，大賭傷身。如果中獎記得做善事喔！✨`;
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`);
+}
+</script>
+</body>
+</html>
